@@ -24,4 +24,6 @@
 	position: absolute;
 	height: 600px;
 	width: 400px;
+	background-repeat: repeat-y;
+	overflow: hidden;
 }
