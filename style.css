@@ -24,8 +24,10 @@
 	position: absolute;
 	height: 600px;
 	width: 400px;
+	background-image: url("./images/clouds.jpg");
 	background-repeat: repeat-y;
 	overflow: hidden;
+	display: none;
 }
 .car{
 	position:absolute;
@@ -39,4 +41,12 @@
 	height: 100px;
 	width: 100px;
 	background-image: url('./images/enemycar.png');
+}
+.bullet{
+	position: absolute;
+	width: 10px;
+	height: 10px;
+	background:yellow;
+	border-top-left-radius:5px;
+	border-top-right-radius:5px;
 }

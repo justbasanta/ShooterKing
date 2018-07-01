@@ -3,26 +3,43 @@ var speed = 0;
 var speed_dy = 1;
 var counter = 0;
 var game_status = true;
+
+var $main = document.getElementById('main');
 var $homescreen = document.getElementById('homescreen-wrapper');
 var $background = document.getElementById('background');
 var $button = document.getElementById('fly-button');
 
+var frame = new Frame();
+
 $button.onclick = function(){
 	console.log('clicked');
 	var pos = 0;
-	$homescreen.style.display = 'none';
-	$background.style.backgroundImage = 'url("./images/clouds.jpg")';
+	$homescreen.style.display = 'block';
+	$background.style.display = 'block';
 	this.style.display = 'none';
+	main();
+}
+function main(){
+	console.log('main started');
+	setInterval(MainGameLoop,15);
+}
 
-	setInterval (function(){
-		if (pos == 600) {
-			pos = 0;
-		}
-		else{
-			pos++;
-			$background.style.backgroundPosition = "0px" + " " + pos +"px";	
-		}
-	},15)
+function MainGameLoop(){
+	// console.log('MainGameLoop Entered');
+	frame.updateBackgroundPostion();
+}
+
+function Frame(){
+	this.backgroundY = 0;
+	this.background_dY = 0;
+
+	var self = this;
+
+	this.updateBackgroundPostion = function(){
+		self.background_dY = speed_dy;
+		$background.style.backgroundPosition = "0px " + self.backgroundY+ "px";
+		self.backgroundY = self.backgroundY + self.background_dY;
+	}
 }
 
 function HeroCar(){
@@ -56,7 +73,48 @@ function HeroCar(){
 			self.$car.style.left = self.carX + 'px';
 	}
 }
-var car = new HeroCar();
+
+
+function enemy(){
+	this.x = 0;
+	this.y = -100;
+	this.dy = 0;
+	this.health = 500;
+	var self = this;
+	var $new_enemy = document.createElement('div');
+	this.createEnemy = function(){
+		self.$new_enemy.className = 'enemy';
+		self.$new_enemy.style.left = self.x + 'px';
+		self.$new_enemy.style.top = self.y + 'px';
+		$background.appendChild(self.$new_enemy);
+	}
+	this.updateEnemey = function(){
+		self.dy = speed_dy;
+		self.y = self.y + self.dy;
+		self.$new_enemy.style.top = self.y+'px';
+	}
+	this.deleteEnemy = function(){
+		$background.removeChild(self.$new_enemy);
+	}
+}
+
+function Bullet(){
+	this.x = 0;
+	this.y = 0;
+	this.dy = 0;
+	var self = this;
+	var $new_bullet = document.createElement('div');
+	console.log($background);
+	this.createBullet = function(){
+		console.log($new_bullet);
+		$new_bullet.className = 'bullet';
+		self.x = car.carX + 45;
+		self.y = car.carY;
+		$new_bullet.style.left = self.x + 'px';
+		$new_bullet.style.top = self.y + 'px';
+		$main.appendChild($new_bullet);
+	}
+}
 
 
 function keydownEventHandler(e)
@@ -109,19 +167,17 @@ function keydownEventHandler(e)
 
 function keyupEventHandler(e)
 	{
-
+		return undefined;
 	}
 
 
 	document.onkeydown = keydownEventHandler;
 	document.onkeyup = keyupEventHandler;
 
-
-
-
-
-
 /*OBJECTS*/
-var hero = new HeroCar();
-hero.updateCarPostion();
+var car = new HeroCar();
+car.updateCarPostion();
 car.resetCarPosition();
+
+var bullet = new Bullet();
+bullet.createBullet();
