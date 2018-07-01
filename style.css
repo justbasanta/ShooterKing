@@ -27,3 +27,16 @@
 	background-repeat: repeat-y;
 	overflow: hidden;
 }
+.car{
+	position:absolute;
+	width:100px;
+	height:100px;
+	background:url('../images/batmobile.png') no-repeat;
+	top: 500px;
+}
+
+.enemy{
+	height: 100px;
+	width: 100px;
+	background-image: url('./images/enemycar.png');
+}
