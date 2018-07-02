@@ -38,6 +38,7 @@
 }
 
 .enemy{
+	position: absolute;
 	height: 100px;
 	width: 100px;
 	background-image: url('./images/enemycar.png');

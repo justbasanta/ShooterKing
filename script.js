@@ -4,6 +4,7 @@ var speed_dy = 1;
 var counter = 0;
 var bullet_count=0;
 var bullets = [];
+var enemies_car = [];
 var game_status = true;
 
 var $main = document.getElementById('main');
@@ -29,11 +30,14 @@ function main(){
 
 function MainGameLoop(){
 	// console.log('MainGameLoop Entered');
+	createEnemies();
+	updateEnemies();
 	updateBullets();
 	frame.updateBackgroundPostion();
 
 	counter++;
-	// bullet_count++;
+	bullet_count++;
+// 	console.log(bullet_count);
 }
 
 function Frame(){
@@ -82,28 +86,75 @@ function HeroCar(){
 }
 
 
-function enemy(){
+function Enemy(){
 	this.x = 0;
 	this.y = -100;
 	this.dy = 0;
 	this.health = 500;
 	var self = this;
 	var $new_enemy = document.createElement('div');
+
 	this.createEnemy = function(){
-		self.$new_enemy.className = 'enemy';
-		self.$new_enemy.style.left = self.x + 'px';
-		self.$new_enemy.style.top = self.y + 'px';
-		$background.appendChild(self.$new_enemy);
+		// console.log(self.$new_enemy);
+		$new_enemy.className = 'enemy';
+		self.x = self.getRandom();
+		$new_enemy.style.left = self.x + 'px';
+		$new_enemy.style.top = self.y + 'px';
+		$background.appendChild($new_enemy);
 	}
-	this.updateEnemey = function(){
+	this.getRandom = function(){
+		var random= Math.random();
+		if(random>=0 && random<0.33)
+		{
+			return 40;
+		}
+		else if(random >=0.33 && random <0.66)
+		{
+			return (150);
+		}
+		else
+		{
+			return (260);
+		}
+	}
+	
+	this.updateEnemy = function(){
 		self.dy = speed_dy;
 		self.y = self.y + self.dy;
-		self.$new_enemy.style.top = self.y+'px';
+		$new_enemy.style.top = self.y+'px';
 	}
 	this.deleteEnemy = function(){
-		$background.removeChild(self.$new_enemy);
+		$background.removeChild($new_enemy);
 	}
 }
+
+function createEnemies(){
+	if(counter > 80-(speed_dy*3))
+		{	
+			var e = new Enemy();
+			(enemies_car).push(e);
+			e.createEnemy();
+			counter = 0;
+		}
+}
+function updateEnemies(){
+	var enemies = enemies_car;
+		for(var i=0;i<enemies.length;i++)
+		{
+			// console.log(enemies[i]);
+			enemies[i].updateEnemy();
+			// console.log(enemies[i]);
+			if(enemies[i].y >600)
+			{
+				enemies[i].deleteEnemy();
+				enemies.splice(i, 1);
+				// enemies[i]=null;
+				// enemies_cars = clearArray(enemies);
+				break;
+			}
+	}
+}
+
 
 function Bullet(){
 	this.bulletX = 0;
@@ -125,7 +176,7 @@ function Bullet(){
 	this.updateBullet = function(){
 		var t = self.bulletY - self.dy;
 		self.bulletY = t;
-		self.$new_bullet.style.top = self.bulletY+"px";
+		$new_bullet.style.top = self.bulletY+"px";
 	}
 	this.deleteBullet = function(){
 		$main.removeChild($new_bullet);
@@ -136,7 +187,7 @@ function updateBullets(){
 	var temp = bullets;
 	for(var i=0; i<bullets.length; i++){
 		temp[i].updateBullet();
-		if (temp[i].bullet.bulletY<0) {
+		if (temp[i].bulletY < 0) {
 			temp[i].deleteBullet();
 			temp[i]=null;
 			bullets = clearArray(temp);
@@ -204,7 +255,7 @@ function keydownEventHandler(e)
 				if(e.keyCode == 32)
 				{
 					//left
-					if(bullet_count >= 9)
+					if(bullet_count >= 5)
 					{
 					var e = new Bullet();
 					(bullets).push(e);
@@ -245,5 +296,3 @@ var car = new HeroCar();
 car.updateCarPostion();
 car.resetCarPosition();
 
-var bullet = new Bullet();
-bullet.createBullet();
