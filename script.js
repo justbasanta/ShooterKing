@@ -5,6 +5,7 @@ var counter = 0;
 var bullet_count=0;
 var bullets = [];
 var enemies_car = [];
+var invunerables_array = [];
 var game_status = true;
 
 var $main = document.getElementById('main');
@@ -16,7 +17,6 @@ var frame = new Frame();
 
 $button.onclick = function(){
 	console.log('clicked');
-	var pos = 0;
 	$homescreen.style.display = 'block';
 	$background.style.display = 'block';
 	this.style.display = 'none';
@@ -33,11 +33,14 @@ function MainGameLoop(){
 	createEnemies();
 	updateEnemies();
 	updateBullets();
+
+	collisionCheck();
+
 	frame.updateBackgroundPostion();
 
 	counter++;
 	bullet_count++;
-// 	console.log(bullet_count);
+	// console.log(bullet_count);
 }
 
 function Frame(){
@@ -139,12 +142,13 @@ function createEnemies(){
 }
 function updateEnemies(){
 	var enemies = enemies_car;
+	console.log(enemies);
 		for(var i=0;i<enemies.length;i++)
 		{
 			// console.log(enemies[i]);
 			enemies[i].updateEnemy();
 			// console.log(enemies[i]);
-			if(enemies[i].y >600)
+			if(enemies[i].y > 600)
 			{
 				enemies[i].deleteEnemy();
 				enemies.splice(i, 1);
@@ -196,13 +200,13 @@ function updateBullets(){
 }
 
 function resetGame(){
-	// var enemies = enemy_cars;
+	// var enemies = enemies_cars;
 	// 	for(var i =0; i<enemies.length;i++)
 	// 		{
 	// 			enemies[i].deleteEnemy();
 	// 			enemies[i] =null;
 	// 		}
-	// 	enemy_cars = clearArray(enemies);
+	// 	enemies_cars = clearArray(enemies);
 		
 		var bullets_temp = bullets;
 		for(var i =0; i<bullets_temp.length;i++)
@@ -222,6 +226,140 @@ function resetGame(){
 	// 	var gameover_background = document.getElementById("gameover-background");
 	// 	gameover_background.style.display = "none"
 }
+
+function collisionCheck()
+	{
+		var carY = car.carY;
+		var carX = car.carX;
+		var ex; var ey;
+		var bx; var by;
+		
+		//Collision check for game-over
+		var etemp = enemies_car;
+		var el = etemp.length;
+		var itemp = invunerables_array;
+		var il = itemp.length;
+		var btemp = bullets;
+		var bl = btemp.length;
+		
+		for (var i=0;i<el;i++)
+			{
+				ex = etemp[i].x;
+				ey = etemp[i].y;
+			  if ( 	(ex+90) > carX		//right edge of e > left edge of car
+					  && ex<=(carX+90)	//left edge of e < right edge of car
+					  && (ey+90) > carY	//bottom edge of e > top edge of car
+					  && ey<= (carY+90)	//top edge of e > bottom edge of car
+					)
+				{
+					// explodeAnim(carX,carY);
+					// var feedbackgameover = document.getElementById("feedbackgameover");
+					// feedbackgameover.innerHTML ="Game Over";
+				  // gameOver();
+				  // game_status = "false";
+				}
+				
+		// 		//Collision check for bullets
+				for (var j=0;j<bl;j++)
+					{
+						if(btemp[j]!=null)
+						{
+							bx = btemp[j].bulletX;
+							by = btemp[j].bulletY;
+							
+							if ( 	(ex+90) > bx		//right edge of e > left edge of bullet
+									  && ex<=(bx+10)	//left edge of e < right edge of bullet
+									  && (ey+70) > by	//bottom edge of e > top edge of bullet
+									  && ey<= (by+10)	//top edge of e > bottom edge of bullet
+								)
+									{
+										btemp[j].deleteBullet();
+										btemp[j] = null;
+										
+										hitAnim(ex,ey);
+										etemp[i].health = etemp[i].health-100;
+										if(etemp[i].health<=0)
+										{
+											explodeAnim(ex,ey);
+											enemies_car.splice(i, 1);
+											etemp[i].deleteEnemy();
+											etemp[i] = null;
+											score = score+50;
+										}
+									 
+								}
+						}
+					}//for j end
+			}//for i end
+			
+			bullets = clearArray(btemp);
+			enemies_car = clearArray(etemp);	
+	}
+
+	function hitAnim(ex,ey)
+{
+	var hit_id = document.createElement('div');
+ 	hit_id.className = "explosion"; //style
+  	hit_id.style.left = (ex-10)+"px";	hit_id.style.top = (ey)+"px";
+  	$main.appendChild(hit_id);
+	hit_id.style.backgroundPosition = "0px "+"0px";
+	
+	var animate = setInterval(updateAnimate,13);
+	var animcounter =0;
+	function updateAnimate()
+	{
+		
+		if(animcounter>=1)
+		{
+		$main.removeChild(hit_id);
+		clearInterval(animate);
+		}
+		animcounter++;
+	}
+}
+
+function explodeAnim(ex,ey)
+{
+	var explode_id = document.createElement('div');
+ 	explode_id.className = "explosion"; //style
+  	explode_id.style.left = (ex)+"px";	explode_id.style.top = (ey)+"px";
+  	$main.appendChild(explode_id);
+	
+	var animate = setInterval(updateAnimate,15);
+	var animcounter =0;
+	function updateAnimate()
+	{
+		if(animcounter==2)
+		{
+			explode_id.style.backgroundPosition = "0px "+"0px";
+		}
+		if(animcounter==4)
+		{
+			explode_id.style.backgroundPosition = "118px "+"0px";
+		}
+		if(animcounter==6)
+		{
+			explode_id.style.backgroundPosition = "236px "+"0px";
+		}
+		if(animcounter==8)
+		{
+			explode_id.style.backgroundPosition = "354px "+"0px";
+		}
+		if(animcounter==10)
+		{
+			explode_id.style.backgroundPosition = "472px "+"0px";
+		}
+		if(animcounter>=12)
+		{
+		$main.removeChild(explode_id);
+		clearInterval(animate);
+		}
+		console.log(animcounter);
+		animcounter++;
+	}
+}
+
+
 
 function clearArray(input){
 	var temp = [];
@@ -257,10 +395,11 @@ function keydownEventHandler(e)
 					//left
 					if(bullet_count >= 5)
 					{
-					var e = new Bullet();
-					(bullets).push(e);
-					e.createBullet();
-					bullet_count =0;
+						console.log('bullet created');
+						var e = new Bullet();
+						(bullets).push(e);
+						e.createBullet();
+						bullet_count =0;
 					}
 				}
 				
