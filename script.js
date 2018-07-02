@@ -2,6 +2,8 @@ var $body = document.getElementsByTagName("body")[0];
 var speed = 0;
 var speed_dy = 1;
 var counter = 0;
+var bullet_count=0;
+var bullets = [];
 var game_status = true;
 
 var $main = document.getElementById('main');
@@ -21,12 +23,17 @@ $button.onclick = function(){
 }
 function main(){
 	console.log('main started');
+	resetGame();
 	setInterval(MainGameLoop,15);
 }
 
 function MainGameLoop(){
 	// console.log('MainGameLoop Entered');
+	updateBullets();
 	frame.updateBackgroundPostion();
+
+	counter++;
+	// bullet_count++;
 }
 
 function Frame(){
@@ -99,23 +106,82 @@ function enemy(){
 }
 
 function Bullet(){
-	this.x = 0;
-	this.y = 0;
-	this.dy = 0;
+	this.bulletX = 0;
+	this.bulletY = 0;
+	this.dy = 10;
+
 	var self = this;
 	var $new_bullet = document.createElement('div');
-	console.log($background);
+
 	this.createBullet = function(){
-		console.log($new_bullet);
+		// console.log($new_bullet);
 		$new_bullet.className = 'bullet';
-		self.x = car.carX + 45;
-		self.y = car.carY;
-		$new_bullet.style.left = self.x + 'px';
-		$new_bullet.style.top = self.y + 'px';
+		self.bulletX = car.carX + 45;
+		self.bulletY = car.carY;
+		$new_bullet.style.left = self.bulletX + 'px';
+		$new_bullet.style.top = self.bulletY + 'px';
 		$main.appendChild($new_bullet);
+	}
+	this.updateBullet = function(){
+		var t = self.bulletY - self.dy;
+		self.bulletY = t;
+		self.$new_bullet.style.top = self.bulletY+"px";
+	}
+	this.deleteBullet = function(){
+		$main.removeChild($new_bullet);
 	}
 }
 
+function updateBullets(){
+	var temp = bullets;
+	for(var i=0; i<bullets.length; i++){
+		temp[i].updateBullet();
+		if (temp[i].bullet.bulletY<0) {
+			temp[i].deleteBullet();
+			temp[i]=null;
+			bullets = clearArray(temp);
+		}
+	}
+}
+
+function resetGame(){
+	// var enemies = enemy_cars;
+	// 	for(var i =0; i<enemies.length;i++)
+	// 		{
+	// 			enemies[i].deleteEnemy();
+	// 			enemies[i] =null;
+	// 		}
+	// 	enemy_cars = clearArray(enemies);
+		
+		var bullets_temp = bullets;
+		for(var i =0; i<bullets_temp.length;i++)
+			{
+				bullets_temp[i].deleteBullet();
+				bullets_temp[i] =null;
+			}
+		bullets = clearArray(bullets_temp);
+		
+		gamestatus="true";
+	// 	Frame.background_y =0;
+		counter=0; bullet_count=0;
+		// speedcounter=0;  invulcounter=0;
+		speed_dy=1;
+	// 	score=0;
+		
+	// 	var gameover_background = document.getElementById("gameover-background");
+	// 	gameover_background.style.display = "none"
+}
+
+function clearArray(input){
+	var temp = [];
+	var len = input.length;
+	for(var i=0; i<len; i++){
+		if (input[i]!= null) {
+			temp.push(input[i]);
+		}
+	}
+	return temp;
+}
 
 function keydownEventHandler(e)
 	{
@@ -135,25 +201,25 @@ function keydownEventHandler(e)
 				}
 				
 				
-				// if(e.keyCode == 32)
-				// {
-				// 	//left
-				// 	if(bullet_counter >= 9)
-				// 	{
-				// 	var e = new Bullet();
-				// 	(bullets).push(e);
-				// 	e.createBullet();
-				// 	bullet_counter =0;
-				// 	}
-				// }
+				if(e.keyCode == 32)
+				{
+					//left
+					if(bullet_count >= 9)
+					{
+					var e = new Bullet();
+					(bullets).push(e);
+					e.createBullet();
+					bullet_count =0;
+					}
+				}
 				
-				// if(e.keyCode == 27)
-				// {
-				// 	gameOver();
-				// 	resetGame();
-				// 	var homescreen = document.getElementById("homescreen");
-				// 	homescreen.style.display="block";
-				// }
+				if(e.keyCode == 27)
+				{
+					gameOver();
+					resetGame();
+					var homescreen = document.getElementById("homescreen");
+					homescreen.style.display="block";
+				}
 			}
 			else
 			{
